@@ -12,7 +12,8 @@ eslint==9
 eslint-config-next==16.4.6
 tailwindcss==4.3.3
 typescript==5
-@prisma/client==6.18.0
+pg==8.16.3
+@types/pg==8.15.5
 bcryptjs==3.0.2
 cors==2.8.5
 dotenv==17.2.3
@@ -25,14 +26,16 @@ zod==4.1.12
 @types/express==5.0.3
 @types/jsonwebtoken==2.8.19
 @types/node==24.10.1
-prisma==6.18.0
 tsx==4.20.6
 typescript==5.9.3
 
-# Future production dependencies and integrations
+# Supabase and future integrations
+supabase-postgresql
+# @supabase/supabase-js for future Supabase REST/Auth/Storage usage
+
 # SMS OTP providers
 msg91-sdk
-# twilio
+# twilio==5.13.0
 
 # Payments
 razorpay
@@ -40,8 +43,7 @@ razorpay
 # Cloud storage
 @aws-sdk/client-s3
 
-# Database and cache services
-postgresql
+# Cache services
 redis-server
 
 # Infrastructure and observability
