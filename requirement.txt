@@ -1,0 +1,50 @@
+# Kshetram dependency and integration requirements
+# Current Node.js/npm dependencies
+concurrently==9.2.1
+next==16.4.6
+react==19.3.0
+react-dom==19.3.0
+@tailwindcss/turbopack==4.3.3
+@types/node==20
+@types/react==19
+@types/react-dom==19
+eslint==9
+eslint-config-next==16.4.6
+tailwindcss==4.3.3
+typescript==5
+@prisma/client==6.18.0
+bcryptjs==3.0.2
+cors==2.8.5
+dotenv==17.2.3
+express==5.1.0
+helmet==8.1.0
+jsonwebtoken==9.0.2
+redis==5.8.3
+zod==4.1.12
+@types/cors==2.8.19
+@types/express==5.0.3
+@types/jsonwebtoken==2.8.19
+@types/node==24.10.1
+prisma==6.18.0
+tsx==4.20.6
+typescript==5.9.3
+
+# Future production dependencies and integrations
+# SMS OTP providers
+msg91-sdk
+# twilio
+
+# Payments
+razorpay
+
+# Cloud storage
+@aws-sdk/client-s3
+
+# Database and cache services
+postgresql
+redis-server
+
+# Infrastructure and observability
+# docker-compose
+# prometheus
+# grafana

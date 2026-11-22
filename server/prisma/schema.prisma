@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  FARMER
+  GOVT_BUYER
+  EQUIPMENT_OFFICER
+  ADMIN
+}
+
+enum KycStatus {
+  NOT_SUBMITTED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ListingStatus {
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  SOLD
+  CANCELLED
+}
+
+enum ResidueFormat {
+  BALED
+  UNBALED
+}
+
+enum BidStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum OrderStatus {
+  CONFIRMED
+  PICKUP_SCHEDULED
+  WEIGHBRIDGE_VERIFIED
+  PAYMENT_PENDING
+  SETTLED
+  CANCELLED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  phone        String     @unique
+  name         String?
+  role         Role       @default(FARMER)
+  kycStatus    KycStatus  @default(NOT_SUBMITTED)
+  kycReference String?
+  listings     StubbleListing[] @relation("FarmerListings")
+  bids         StubbleBid[]     @relation("BuyerBids")
+  farmerOrders StubbleOrder[]   @relation("FarmerOrders")
+  buyerOrders  StubbleOrder[]   @relation("BuyerOrders")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model StubbleListing {
+  id              String           @id @default(cuid())
+  farmerId        String
+  cropType        String
+  weightQuintals  Decimal          @db.Decimal(10, 2)
+  moisturePercent Decimal          @db.Decimal(5, 2)
+  residueFormat   ResidueFormat
+  latitude        Decimal          @db.Decimal(9, 6)
+  longitude       Decimal          @db.Decimal(9, 6)
+  status          ListingStatus    @default(PENDING_APPROVAL)
+  rejectionReason String?
+  farmer          User             @relation("FarmerListings", fields: [farmerId], references: [id])
+  bids            StubbleBid[]
+  order           StubbleOrder?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model StubbleBid {
+  id               String         @id @default(cuid())
+  listingId        String
+  buyerId          String
+  amountPerQuintal Decimal        @db.Decimal(10, 2)
+  status           BidStatus      @default(PENDING)
+  listing          StubbleListing @relation(fields: [listingId], references: [id])
+  buyer            User           @relation("BuyerBids", fields: [buyerId], references: [id])
+  order            StubbleOrder?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@unique([listingId, buyerId])
+}
+
+model StubbleOrder {
+  id                    String         @id @default(cuid())
+  listingId             String         @unique
+  bidId                 String         @unique
+  farmerId              String
+  buyerId               String
+  status                OrderStatus    @default(CONFIRMED)
+  verifiedWeightQuintals Decimal?       @db.Decimal(10, 2)
+  settlementAmount      Decimal?       @db.Decimal(12, 2)
+  bankReference         String?
+  listing               StubbleListing @relation(fields: [listingId], references: [id])
+  bid                   StubbleBid     @relation(fields: [bidId], references: [id])
+  farmer                User           @relation("FarmerOrders", fields: [farmerId], references: [id])
+  buyer                 User           @relation("BuyerOrders", fields: [buyerId], references: [id])
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+}

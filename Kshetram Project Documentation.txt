@@ -1,0 +1,200 @@
+SOFTWARE REQUIREMENTS & ARCHITECTURE SPECIFICATION
+Kshetram
+Agri-Commerce, Crop Residue Marketplace, and Government Equipment Lending Platform
+1. Executive Overview
+Kshetram is an integrated agricultural e-commerce and resource management platform designed to
+bridge the gap between farmers, certified government procurement agencies, and agricultural input
+suppliers. The platform directly addresses crop residue management by creating an economic
+incentive for farmers to harvest and sell agricultural stubble rather than burning it, while
+simultaneously providing essential farming inputs and daily agronomic guidance.
+Core Mission: Transform crop residue from an environmental liability into a verified revenue stream
+for farmers, backed by accessible government machinery, quality seeds, livestock nutrition, and daily
+actionable farming insights.
+2. User Roles & Access Control
+Role
+Verification Requirement
+Primary Platform Capabilities
+Farmer
+Mobile OTP & Land/Kisan ID
+verification
+List cut stubble for sale, book government
+stubble mowers, buy/sell seeds, purchase
+cattle feed, and view daily farming suggestions.
+Certified Government
+Buyer
+Official agency credentials &
+Admin approval
+Browse verified stubble listings by crop type
+and location, place bulk procurement orders,
+and schedule residue collection.
+Government
+Equipment Officer
+Departmental ID & Admin
+approval
+Manage stubble mower inventory, approve
+farmer rental bookings, track dispatch/return
+logs, and log maintenance status.
+Platform
+Administrator
+System Super-Admin credentials
+Verify government buyers and seed vendors,
+publish daily farming suggestions, oversee
+transactions, and resolve disputes.
+3. Core Platform Features
+3.1 Crop Stubble Marketplace (Farmer-to-Government)
+Enables farmers to monetize harvested crop residue (such as paddy straw, wheat stalks, and
+sugarcane trash) by connecting them exclusively with verified institutional and government buyers
+(e.g., biomass power plants, bio-CNG facilities, and state procurement boards).
+Kshetram — Technical & Product Specification
+Page 1 of 5
+
+Stubble Listing Creation: Farmers specify crop type, estimated weight (in quintals or metric
+tons), moisture level, baled/unbaled status, and farm pickup coordinates.
+Verified Buyer Access: Only accounts holding a validated Certified Government Buyer badge
+can view contact details, initiate bids, or execute purchase orders.
+Pickup & Settlement Tracking: End-to-end order lifecycle tracking from listing approval and
+weighbridge verification to direct bank transfer settlement.
+3.2 Government Stubble Mower Lending System
+Provides small and marginal farmers with affordable, scheduled access to heavy crop-residue
+management machinery (such as Happy Seeders, Super SMS, balers, and rotary mulchers) owned
+by government custom hiring centers.
+Availability Calendar: Real-time visibility into nearby government depots and available stubble
+mowers based on the farmer's district or pin code.
+Slot-Based Booking: Farmers reserve equipment by acreage and date window with transparent
+subsidized rental rates or zero-fee government schemes.
+Handover & Return Verification: Digital check-out and check-in logs recorded by the local
+equipment officer to ensure timely turnaround during peak harvest windows.
+3.3 Daily Farming Suggestion Engine
+Delivers exactly one focused, high-impact suggestion per day to every farmer on their home
+dashboard and via optional notifications, preventing information overload while encouraging
+sustainable practices.
+Curated Daily Card: Highlights a single actionable tip covering soil health, irrigation timing, pest
+prevention, residue decomposition, or seasonal crop rotation.
+Contextual Relevance: Suggestions can be tailored by season (Kharif, Rabi, Zaid) and regional
+agro-climatic zones, accompanied by a searchable archive of past daily tips.
+3.4 Seed Exchange & Marketplace (Buy & Sell)
+A two-way agricultural marketplace where farmers can purchase certified high-yield seeds as well as
+list their own harvested, quality-graded seeds for peer-to-peer or institutional sale.
+Catalog & Filtering: Browse seeds by crop category, variety, germination rate, harvest season,
+and certification status.
+Farmer Seed Listings: Allows experienced farmers and seed cooperatives to list surplus clean
+seeds with batch details, pricing per kilogram, and minimum order quantities.
+3.5 Cattle Feeding Store
+A dedicated e-commerce vertical catering to dairy and livestock-owning farmers, offering balanced
+nutritional products alongside crop-residue-based fodder options.
+Kshetram — Technical & Product Specification
+Page 2 of 5
+
+Product Categories: Green and dry fodder bales, silage, mineral mixtures, oilseed cakes,
+compound cattle feed pellets, and calf starter rations.
+Bulk & Subscription Ordering: Supports single-bag purchases as well as recurring monthly feed
+deliveries tailored to herd size.
+4. Recommended Technology Stack
+The architecture prioritizes reliability on low-bandwidth rural mobile networks, strong transactional
+integrity for payments and government verification, and modular scalability.
+Layer
+Technology Choice
+Architectural Justification
+Frontend Web App
+Next.js (React) + TypeScript +
+Tailwind CSS
+Server-side rendering for fast initial page loads on
+slower connections, responsive mobile-first layouts,
+and multilingual (i18n) support for regional
+languages.
+Backend API
+Node.js + Express (or NestJS)
+with TypeScript
+Modular RESTful API structure capable of handling
+concurrent marketplace orders, equipment booking
+locks, and scheduled daily suggestion jobs.
+Database & Caching
+PostgreSQL + Redis
+PostgreSQL ensures ACID compliance for financial
+transactions, inventory counts, and mower
+reservations; Redis caches the daily farming
+suggestion and catalog queries.
+Authentication
+JWT + Role-Based Access
+Control (RBAC) + SMS OTP
+Frictionless phone-number OTP login for farmers
+combined with strict credential verification and
+RBAC middleware for certified government buyers.
+Payments & Alerts
+Razorpay / UPI Gateway +
+Twilio / MSG91
+Seamless UPI and bank settlement integration for
+seed/feed purchases and stubble payouts, paired
+with SMS alerts for mower booking confirmations
+and daily tips.
+File Storage
+AWS S3 / Cloudinary
+Stores stubble lot photos, government buyer
+accreditation certificates, seed quality reports, and
+cattle feed product imagery.
+5. Project Directory Structure
+A clean, modular monorepo layout separating the web client, backend API services, database
+migrations, and background scheduling workers.
+Kshetram — Technical & Product Specification
+Page 3 of 5
+
+kshetram/
+├── client/                          # Next.js Frontend Application
+│   ├── public/                      # Static assets, icons, and regional locale 
+files
+│   └── src/
+│       ├── app/                     # App Router pages (marketplace, mowers, 
+seeds, cattle-feed)
+│       ├── components/              # Reusable UI components
+│       │   ├── daily-tip/           # Daily farming suggestion banner & archive 
+modal
+│       │   ├── stubble/             # Stubble listing forms & govt buyer 
+procurement cards
+│       │   ├── mowers/              # Equipment availability calendar & booking 
+drawer
+│       │   └── store/               # Shared cart, checkout, and product cards 
+(seeds & feed)
+│       ├── context/                 # Auth, Cart, and Language state providers
+│       └── services/                # Typed API client wrappers
+│
+├── server/                          # Node.js / Express Backend
+│   ├── src/
+│   │   ├── config/                  # Database, Redis, SMS, and payment gateway 
+setup
+│   │   ├── middleware/              # JWT verification, RBAC guards (isGovtBuyer, 
+isFarmer)
+│   │   ├── modules/                 # Domain-driven feature modules
+│   │   │   ├── auth/                # OTP login & government buyer KYC 
+verification
+│   │   │   ├── stubble/             # Stubble listings, bids, and procurement 
+orders
+│   │   │   ├── mowers/              # Govt machinery inventory, slot locking, and 
+rentals
+│   │   │   ├── daily-suggestion/    # Single daily tip selector & regional 
+mapping
+│   │   │   ├── seeds/               # Two-way seed buying and farmer selling 
+endpoints
+│   │   │   └── cattle-feed/         # Fodder and livestock nutrition catalog & 
+orders
+│   │   ├── jobs/                    # Cron job to rotate the single daily farming 
+suggestion
+│   │   └── app.ts                   # Express application entry point
+│   └── prisma/                      # Database schema and migration history
+│
+└── docker-compose.yml               # Local orchestration for PostgreSQL, Redis, 
+and services
+Kshetram — Technical & Product Specification
+Page 4 of 5
+
+6. Key System Workflows & Data Integrity
+Double-Booking Prevention on Mowers: Equipment reservation endpoints use database-level
+date-range constraints and transactional locks so two farmers cannot book the same stubble
+mower for overlapping time slots.
+Strict Buyer Gating: API middleware enforces role === 'GOVT_BUYER' &&
+verificationStatus === 'APPROVED' on all stubble purchase endpoints, preventing
+unverified third parties from accessing farmer stubble listings.
+Deterministic Daily Suggestion Delivery: A scheduled midnight background job selects and
+caches one active suggestion per agro-climatic zone for the next 24 hours, ensuring every farmer
+sees a consistent, single daily recommendation across web and SMS channels.
+Kshetram — Technical & Product Specification
+Page 5 of 5
